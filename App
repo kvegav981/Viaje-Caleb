@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>🕷️ La Misión de Caleb</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#D32F2F;--red2:#B71C1C;--blue:#1565C0;--blue2:#0D47A1;
+  --web:#fff;--bg:#0D47A1;--card:#fff;--muted:#546E7A;--light:#CFD8DC;
+  --yellow:#FFD54F;--darkbg:#1a1a2e;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito',sans-serif;background:#0D47A1;min-height:100vh;overflow-x:hidden;}
+
+/* ── HEADER ── */
+.hdr{
+background:linear-gradient(160deg,#B71C1C 0%,#D32F2F 50%,#C62828 100%);
+padding:0;position:relative;overflow:hidden;
+}
+/* Web pattern overlay */
+.hdr::before{
+content:’’;position:absolute;inset:0;
+background-image:
+repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(255,255,255,.07) 28px,rgba(255,255,255,.07) 29px),
+repeating-linear-gradient(90deg,transparent,transparent 28px,rgba(255,255,255,.07) 28px,rgba(255,255,255,.07) 29px);
+pointer-events:none;
+}
+.hdr-inner{padding:14px 15px 12px;position:relative;z-index:1;}
+.hdr-top{display:flex;align-items:center;gap:10px;}
+.spidey-logo{font-size:42px;animation:spideyBob 2s ease-in-out infinite;}
+@keyframes spideyBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.hdr-text .htitle{font-family:‘Fredoka One’,cursive;font-size:22px;color:#fff;text-shadow:2px 3px 0 rgba(0,0,0,.4);}
+.hdr-text .hsub{font-size:11px;color:rgba(255,255,255,.85);font-weight:800;margin-top:2px;}
+/* Hanging web thread */
+.web-thread{
+position:absolute;top:0;right:24px;width:2px;
+background:linear-gradient(to bottom,rgba(255,255,255,.6),rgba(255,255,255,.1));
+animation:threadLen 3s ease-in-out infinite;
+transform-origin:top center;
+}
+@keyframes threadLen{0%,100%{height:50px}50%{height:70px}}
+.web-spidey-hang{position:absolute;right:16px;font-size:22px;animation:hang 3s ease-in-out infinite;}
+@keyframes hang{0%,100%{top:50px}50%{top:70px}}
+
+/* ── TABS ── */
+.tabs{display:flex;background:#B71C1C;position:sticky;top:0;z-index:30;box-shadow:0 3px 12px rgba(0,0,0,.4);overflow-x:auto;}
+.tab{flex:1;min-width:56px;padding:7px 3px;border:none;background:none;cursor:pointer;font-family:‘Nunito’,sans-serif;font-size:9.5px;font-weight:800;color:rgba(255,255,255,.5);transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.tab .ti{font-size:20px;}
+.tab.active{color:#FFD54F;border-bottom:3px solid #FFD54F;}
+
+/* ── SECTIONS ── */
+.sec{display:none;padding:12px;}
+.sec.active{display:block;}
+.slbl{font-family:‘Fredoka One’,cursive;font-size:18px;color:#B71C1C;margin-bottom:9px;}
+.card{background:#fff;border-radius:18px;overflow:hidden;margin-bottom:13px;box-shadow:0 6px 24px rgba(0,0,0,.25);}
+
+/* ── SETUP PANEL ── */
+.setup-panel{padding:14px;background:#FFEBEE;border-bottom:3px solid #EF9A9A;position:relative;overflow:hidden;}
+.setup-panel::after{
+content:‘🕸️’;position:absolute;right:10px;bottom:-4px;font-size:40px;opacity:.12;
+}
+.setup-title{font-family:‘Fredoka One’,cursive;font-size:15px;color:#B71C1C;margin-bottom:8px;}
+.setup-row{display:flex;gap:10px;}
+.fg{flex:1;}
+.fg label{display:block;font-size:10px;font-weight:800;color:#C62828;text-transform:uppercase;letter-spacing:.4px;margin-bottom:3px;}
+.fg input{border:2px solid #EF9A9A;border-radius:9px;padding:8px 9px;font-family:‘Nunito’,sans-serif;font-size:14px;font-weight:800;width:100%;outline:none;background:#fff;transition:border .2s;color:#1a1a1a;}
+.fg input:focus{border-color:#D32F2F;}
+
+/* ── MAP ── */
+.map-wrap{position:relative;overflow:hidden;}
+#mapCanvas{display:block;width:100%;touch-action:auto;}
+
+/* ── GO BUTTON ── */
+.btn-go{
+display:block;margin:12px 14px 0;border:none;border-radius:14px;padding:14px;
+font-family:‘Fredoka One’,cursive;font-size:18px;cursor:pointer;transition:transform .15s;
+width:calc(100% - 28px);
+background:linear-gradient(135deg,#D32F2F,#B71C1C);
+color:#fff;box-shadow:0 5px 18px rgba(183,28,28,.5);
+letter-spacing:.5px;
+position:relative;overflow:hidden;
+}
+.btn-go::before{content:‘🕷️’;position:absolute;left:16px;top:50%;transform:translateY(-50%);font-size:20px;}
+.btn-go::after{content:‘🕷️’;position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:20px;}
+.btn-go:active{transform:scale(.96);}
+
+/* ── KID PROGRESS ── */
+.kid-progress{padding:14px;background:#FFEBEE;border-top:3px solid #EF9A9A;position:relative;}
+/* web corner decorations */
+.kid-progress::before{content:‘🕸️’;position:absolute;top:6px;right:10px;font-size:30px;opacity:.15;}
+
+.kid-time-row{display:flex;gap:8px;margin-bottom:12px;}
+.kid-time-box{flex:1;background:#fff;border-radius:14px;padding:10px 6px;text-align:center;box-shadow:0 3px 10px rgba(183,28,28,.15);border:2px solid #FFCDD2;}
+.kid-time-box .big-icon{font-size:28px;display:block;margin-bottom:2px;}
+.kid-time-box .time-val{font-family:‘Fredoka One’,cursive;font-size:17px;color:#B71C1C;}
+.kid-time-box .time-lbl{font-size:9px;font-weight:800;color:#90A4AE;text-transform:uppercase;display:block;margin-top:1px;}
+.kid-time-box.paused .time-val{color:#1565C0;}
+
+/* PROGRESS BAR */
+.big-prog-wrap{margin-bottom:10px;}
+.big-prog-label{font-family:‘Fredoka One’,cursive;font-size:15px;color:#B71C1C;margin-bottom:6px;text-align:center;}
+.big-prog-track{
+background:#FFCDD2;border-radius:30px;height:46px;position:relative;overflow:hidden;
+border:3px solid #EF9A9A;
+}
+.big-prog-fill{
+height:100%;border-radius:30px;min-width:46px;
+background:linear-gradient(90deg,#D32F2F,#FF6F00);
+transition:width .8s ease;position:relative;
+}
+/* Web pattern on fill */
+.big-prog-fill::after{
+content:’’;position:absolute;inset:0;
+background-image:repeating-linear-gradient(45deg,transparent,transparent 6px,rgba(255,255,255,.1) 6px,rgba(255,255,255,.1) 7px);
+border-radius:30px;
+}
+.big-prog-car{position:absolute;right:-4px;top:50%;transform:translateY(-50%);font-size:36px;filter:drop-shadow(1px 2px 4px rgba(0,0,0,.3));z-index:1;}
+
+/* MILESTONE STARS — spider-themed */
+.stars-row{display:flex;justify-content:space-around;margin-bottom:12px;}
+.star-ms{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.star-ms .s-icon{font-size:36px;filter:grayscale(1) opacity(.25);transition:all .5s;}
+.star-ms .s-icon.lit{filter:none;animation:webPop .5s cubic-bezier(.68,-.55,.27,1.55);}
+@keyframes webPop{0%{transform:scale(0) rotate(-20deg)}60%{transform:scale(1.5) rotate(10deg)}100%{transform:scale(1) rotate(0deg)}}
+
+/* BUTTONS */
+.btn{border:none;border-radius:14px;padding:12px;font-family:‘Fredoka One’,cursive;font-size:15px;cursor:pointer;transition:transform .15s;display:block;}
+.btn:active{transform:scale(.96);}
+.btn-pause{background:linear-gradient(135deg,#1565C0,#0D47A1);color:#fff;box-shadow:0 4px 12px rgba(13,71,161,.35);}
+.btn-resume{background:linear-gradient(135deg,#D32F2F,#B71C1C);color:#fff;box-shadow:0 4px 12px rgba(183,28,28,.35);}
+.btn-reset{background:#ECEFF1;color:var(–muted);font-family:‘Nunito’,sans-serif;font-weight:800;font-size:11px;border-radius:9px;padding:6px 12px;width:auto;display:inline-block;border:none;cursor:pointer;margin:10px 14px 12px;}
+.action-row{display:flex;gap:8px;margin-bottom:12px;}
+
+/* PAUSE PANEL */
+.pause-panel{padding:12px 14px;background:#E3F2FD;border-top:3px solid #90CAF9;display:none;}
+.pause-panel.show{display:block;}
+.pause-title{font-family:‘Fredoka One’,cursive;font-size:16px;color:#1565C0;margin-bottom:7px;}
+.pause-info{font-size:11px;font-weight:800;color:#0D47A1;background:#BBDEFB;border-radius:9px;padding:7px 10px;margin-bottom:8px;}
+.pause-inputs{display:flex;gap:8px;align-items:flex-end;}
+.pause-inputs .fg label{color:#1565C0;}
+.pause-inputs .fg input{border-color:#90CAF9;}
+.pause-inputs .fg input:focus{border-color:#1565C0;}
+
+/* STOP LOG */
+.stop-log{padding:8px 14px 12px;background:#FFEBEE;}
+.stop-log-title{font-size:10px;font-weight:800;color:#B71C1C;text-transform:uppercase;margin-bottom:6px;}
+.stop-entry{display:flex;align-items:center;gap:7px;background:#fff;border-radius:9px;padding:7px 10px;margin-bottom:5px;font-size:11px;font-weight:700;color:#37474F;box-shadow:0 1px 5px rgba(0,0,0,.08);}
+.stop-dot{width:9px;height:9px;border-radius:50%;background:#D32F2F;flex-shrink:0;}
+
+/* STOPS ROW */
+.stops-row{display:flex;gap:6px;padding:0 14px 12px;background:#FFEBEE;}
+.sb{flex:1;padding:9px 4px;border:2px solid #FFCDD2;border-radius:11px;background:#fff;cursor:pointer;font-family:‘Nunito’,sans-serif;font-weight:800;font-size:11px;color:#B71C1C;text-align:center;line-height:1.4;transition:all .2s;}
+.sb.done{background:#FFEBEE;border-color:#EF9A9A;color:#B71C1C;}
+.sb:active{transform:scale(.95);}
+
+/* ── GAMES ── */
+.gg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px;}
+.gc{background:#fff;border-radius:16px;padding:14px 10px;text-align:center;box-shadow:0 4px 16px rgba(0,0,0,.15);cursor:pointer;transition:transform .15s;border:3px solid transparent;}
+.gc:active{transform:scale(.95);}
+.gc .gi{font-size:34px;margin-bottom:5px;}
+.gc .gn{font-family:‘Fredoka One’,cursive;font-size:14px;color:#37474F;}
+.gc .gd{font-size:9.5px;color:#90A4AE;font-weight:700;margin-top:2px;}
+.gc-r1{border-color:#EF5350;background:#FFEBEE;}
+.gc-r2{border-color:#FF8F00;background:#FFF3E0;}
+.gc-b1{border-color:#42A5F5;background:#E3F2FD;}
+.gc-b2{border-color:#7E57C2;background:#EDE7F6;}
+.gc-r3{border-color:#EC407A;background:#FCE4EC;}
+.gc-b3{border-color:#26C6DA;background:#E0F7FA;}
+
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;align-items:flex-end;}
+.ov.open{display:flex;}
+.panel{background:#fff;border-radius:22px 22px 0 0;padding:16px;width:100%;max-height:88vh;overflow-y:auto;}
+.panel-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.pt{font-family:‘Fredoka One’,cursive;font-size:20px;color:#B71C1C;}
+.cb{background:#FFEBEE;border:none;width:30px;height:30px;border-radius:50%;font-size:15px;cursor:pointer;color:#B71C1C;}
+.gc2{margin-top:4px;}
+.si2{display:flex;align-items:center;gap:9px;padding:10px;background:#FFF5F5;border-radius:11px;margin-bottom:7px;cursor:pointer;border:2px solid transparent;}
+.si2:active,.si2.found{background:#FFEBEE;border-color:#EF9A9A;}
+.si2.found{text-decoration:line-through;opacity:.6;}
+.si2 .sic{font-size:26px;}.si2 .sil{font-weight:700;font-size:13px;color:#37474F;}
+.rc{background:linear-gradient(135deg,#FFEBEE,#E3F2FD);border-radius:14px;padding:16px;text-align:center;margin-bottom:11px;border:2px solid #FFCDD2;}
+.rq{font-size:14px;font-weight:800;color:#37474F;line-height:1.5;margin-bottom:12px;}
+.rab{background:linear-gradient(135deg,#D32F2F,#B71C1C);color:#fff;border:none;border-radius:9px;padding:8px 20px;font-family:‘Fredoka One’,cursive;font-size:14px;cursor:pointer;display:none;}
+.rat{display:none;font-size:19px;font-weight:800;color:#B71C1C;margin-top:7px;}
+.bn{background:linear-gradient(135deg,#D32F2F,#B71C1C);color:#fff;border:none;border-radius:9px;padding:9px 15px;font-family:‘Fredoka One’,cursive;font-size:14px;cursor:pointer;display:block;width:100%;margin-top:8px;}
+.abcg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.ac{background:#FFF5F5;border-radius:8px;padding:7px 2px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all .2s;}
+.ac.found{background:#FFEBEE;border-color:#EF9A9A;}
+.ac .al{font-family:‘Fredoka One’,cursive;font-size:18px;color:#D32F2F;}
+.ac .aw{font-size:7.5px;font-weight:700;color:#78909C;}
+
+/* SNACKS */
+.stip{background:linear-gradient(135deg,#FFEBEE,#FFF3E0);border-radius:12px;padding:11px;margin-bottom:11px;font-size:11.5px;font-weight:700;color:#B71C1C;border-left:4px solid #D32F2F;}
+.sng{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.snc{background:#fff;border-radius:12px;padding:10px;box-shadow:0 3px 10px rgba(183,28,28,.1);display:flex;align-items:center;gap:7px;cursor:pointer;transition:all .2s;border:2px solid transparent;}
+.snc:active{border-color:#EF9A9A;}
+.snc.given{opacity:.5;}
+.sni{font-size:28px;}.snn{font-weight:800;font-size:12px;color:#37474F;}.snno{font-size:9.5px;color:#90A4AE;}.snck{font-size:14px;margin-left:auto;}
+
+/* SONGS */
+.song{background:#fff;border-radius:12px;padding:11px;margin-bottom:8px;box-shadow:0 3px 10px rgba(183,28,28,.1);display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .2s;flex-wrap:wrap;border:2px solid transparent;}
+.song.playing{background:#FFEBEE;border-color:#EF9A9A;}
+.song .soi{font-size:24px;}.song .son{font-weight:800;font-size:12px;color:#37474F;}.song .sot{font-size:9.5px;color:#90A4AE;}.song .sop{margin-left:auto;font-size:18px;}
+.lyrics{background:#E3F2FD;border-radius:8px;padding:8px 11px;margin-top:6px;font-size:11px;color:#1565C0;font-weight:700;display:none;line-height:1.8;width:100%;}
+.lyrics.show{display:block;}
+
+/* STICKERS */
+.sbd{background:#fff;border-radius:14px;min-height:100px;padding:12px;margin-bottom:12px;box-shadow:inset 0 2px 8px rgba(183,28,28,.1);display:flex;flex-wrap:wrap;gap:5px;justify-content:center;align-items:flex-start;border:2px dashed #FFCDD2;}
+.es{font-size:34px;animation:popIn .3s cubic-bezier(.68,-.55,.27,1.55);}
+@keyframes popIn{0%{transform:scale(0)}100%{transform:scale(1)}}
+.spk{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px;}
+.so{font-size:28px;text-align:center;padding:5px;background:#fff;border-radius:9px;cursor:pointer;box-shadow:0 2px 8px rgba(183,28,28,.12);border:2px solid transparent;}
+.so:active{transform:scale(1.3);}
+.so.sel{background:#FFEBEE;border-color:#D32F2F;}
+.eb{background:linear-gradient(135deg,#D32F2F,#B71C1C);color:#fff;border:none;border-radius:12px;padding:12px;font-family:‘Fredoka One’,cursive;font-size:16px;cursor:pointer;box-shadow:0 5px 14px rgba(183,28,28,.4);width:100%;}
+.eb:active{transform:scale(.95);}
+.sd{font-family:‘Fredoka One’,cursive;font-size:18px;color:#D32F2F;margin:5px 0 12px;text-align:center;}
+
+/* WEB DIVIDER */
+.web-divider{text-align:center;font-size:13px;letter-spacing:2px;color:#EF9A9A;margin:4px 0 8px;font-weight:800;}
+</style>
+
+</head>
+<body>
+
+<!-- HEADER -->
+
+<div class="hdr">
+  <div class="web-thread" style="height:55px"></div>
+  <div class="web-spidey-hang">🕷️</div>
+  <div class="hdr-inner">
+    <div class="hdr-top">
+      <div class="spidey-logo">🕷️</div>
+      <div class="hdr-text">
+        <div class="htitle">¡La Misión de Caleb!</div>
+        <div class="hsub">El Hombre Araña necesita tu ayuda 🕸️</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+
+<div class="tabs">
+  <button class="tab active" onclick="showTab('ruta',this)"><span class="ti">🗺️</span>MISIÓN</button>
+  <button class="tab" onclick="showTab('juegos',this)"><span class="ti">🎮</span>JUEGOS</button>
+  <button class="tab" onclick="showTab('snacks',this)"><span class="ti">🍎</span>SNACKS</button>
+  <button class="tab" onclick="showTab('canciones',this)"><span class="ti">🎵</span>CANCIONES</button>
+  <button class="tab" onclick="showTab('premios',this)"><span class="ti">⭐</span>PREMIOS</button>
+</div>
+
+<!-- ===== MISIÓN / RUTA ===== -->
+
+<div id="ruta" class="sec active">
+<div class="card">
+
+  <div class="setup-panel">
+    <div class="setup-title">🕷️ Cuartel General — Solo para papá</div>
+    <div class="setup-row">
+      <div class="fg"><label>🕐 Salimos a las</label><input type="time" id="departT" value="07:00"></div>
+      <div class="fg"><label>🏠 Llegamos a las</label><input type="time" id="arrivalT" value="10:00"></div>
+    </div>
+  </div>
+
+  <!-- MAP CANVAS -->
+
+  <div class="map-wrap">
+    <canvas id="mapCanvas" height="230"></canvas>
+  </div>
+
+<button class="btn-go" onclick="startJourney()">¡LANZAR TELARAÑA!</button>
+
+  <!-- KID PROGRESS -->
+
+  <div id="kidProgress" style="display:none">
+    <div class="kid-progress">
+
+```
+  <div class="web-divider">· · · 🕸️ · · ·</div>
+
+  <div class="kid-time-row">
+    <div class="kid-time-box">
+      <span class="big-icon">🌅</span>
+      <span class="time-val" id="dspDepart">—</span>
+      <span class="time-lbl">Salimos</span>
+    </div>
+    <div class="kid-time-box" id="nowBox">
+      <span class="big-icon" id="nowIcon">🕷️</span>
+      <span class="time-val" id="dspNow">—</span>
+      <span class="time-lbl">Ahora</span>
+    </div>
+    <div class="kid-time-box">
+      <span class="big-icon">🏠</span>
+      <span class="time-val" id="dspArrival">—</span>
+      <span class="time-lbl">Llegamos</span>
+    </div>
+  </div>
+
+  <!-- BIG PROGRESS BAR -->
+  <div class="big-prog-wrap">
+    <div class="big-prog-label" id="progLabel">🕷️ ¡La misión comienza!</div>
+    <div class="big-prog-track">
+      <div class="big-prog-fill" id="progFill" style="width:3%">
+        <span class="big-prog-car">🕷️</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- MILESTONE BADGES — spider themed -->
+  <div class="stars-row">
+    <div class="star-ms"><span class="s-icon" id="ms1">🕸️</span></div>
+    <div class="star-ms"><span class="s-icon" id="ms2">💥</span></div>
+    <div class="star-ms"><span class="s-icon" id="ms3">🦸</span></div>
+    <div class="star-ms"><span class="s-icon" id="ms4">🏆</span></div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn btn-pause" id="btnPause" onclick="pauseJourney()" style="flex:1">⏸️ Parada secreta</button>
+    <button class="btn btn-resume" id="btnResume" onclick="showResumePanel()" style="flex:1;display:none">▶️ ¡Seguimos!</button>
+  </div>
+
+  <div class="pause-panel" id="pausePanel">
+    <div class="pause-title">🔵 ¡Parada de misión!</div>
+    <div class="pause-info" id="pauseInfo">Paramos a las —. ¿A qué hora seguimos?</div>
+    <div class="pause-inputs">
+      <div class="fg"><label>▶️ Seguimos a las</label><input type="time" id="resumeT"></div>
+      <button class="btn btn-resume" style="width:auto;padding:9px 14px;flex:none" onclick="resumeJourney()">¡Vamos!</button>
+    </div>
+  </div>
+
+  <div class="stop-log" id="stopLog" style="display:none">
+    <div class="stop-log-title">🕸️ Paradas de la misión</div>
+    <div id="stopEntries"></div>
+  </div>
+
+</div>
+
+<div class="stops-row">
+  <div class="sb" id="sb1" onclick="toggleStop(1)">🚽<br>Baño</div>
+  <div class="sb" id="sb2" onclick="toggleStop(2)">🍔<br>Comida</div>
+  <div class="sb" id="sb3" onclick="toggleStop(3)">⛽<br>Gasolina</div>
+</div>
+```
+
+  </div>
+
+<button class="btn-reset" onclick="resetJourney()">🔄 Nueva misión</button>
+
+</div>
+</div>
+
+<!-- ===== JUEGOS ===== -->
+
+<div id="juegos" class="sec">
+  <div class="slbl">🕷️ Juegos del Hombre Araña</div>
+  <div class="gg">
+    <div class="gc gc-r1" onclick="openGame('spy')"><div class="gi">👁️</div><div class="gn">Ojo de Araña</div><div class="gd">¡Busca como Spidey!</div></div>
+    <div class="gc gc-b1" onclick="openGame('riddle')"><div class="gi">🤔</div><div class="gn">Acertijos</div><div class="gd">¿Eres tan listo como Spidey?</div></div>
+    <div class="gc gc-r2" onclick="openGame('abc')"><div class="gi">🔤</div><div class="gn">ABC del Camino</div><div class="gd">Busca letras afuera</div></div>
+    <div class="gc gc-b2" onclick="openGame('story')"><div class="gi">📖</div><div class="gn">Historia Loca</div><div class="gd">Inventen una aventura</div></div>
+    <div class="gc gc-r3" onclick="openGame('colors')"><div class="gi">🌈</div><div class="gn">Caza Colores</div><div class="gd">¡El primero en ver gana!</div></div>
+    <div class="gc gc-b3" onclick="openGame('cars')"><div class="gi">🚗</div><div class="gn">Cuenta Carros</div><div class="gd">¿Cuántos de cada color?</div></div>
+  </div>
+</div>
+<div class="ov" id="gameOv"><div class="panel">
+  <div class="panel-hdr">
+    <div class="pt" id="gT"></div>
+    <button class="cb" onclick="closeGame()">✕</button>
+  </div>
+  <div class="gc2" id="gC"></div>
+</div></div>
+
+<!-- ===== SNACKS ===== -->
+
+<div id="snacks" class="sec">
+  <div class="stip">🕷️ <strong>Tip de Spidey:</strong> ¡Todo superhéroe necesita energía! Un snack cada 45-60 min. 💪</div>
+  <div class="slbl">⚡ Energía para la misión</div>
+  <div class="sng">
+    <div class="snc" onclick="giveSnack(this)"><span class="sni">🍌</span><div><div class="snn">Banano</div><div class="snno">Energía rápida</div></div><span class="snck">⬜</span></div>
+    <div class="snc" onclick="giveSnack(this)"><span class="sni">🧃</span><div><div class="snn">Jugo</div><div class="snno">Hidratación</div></div><span class="snck">⬜</span></div>
+    <div class="snc" onclick="giveSnack(this)"><span class="sni">🥨</span><div><div class="snn">Galletas</div><div class="snno">Fácil de cargar</div></div><span class="snck">⬜</span></div>
+    <div class="snc" onclick="giveSnack(this)"><span class="sni">🍇</span><div><div class="snn">Uvitas</div><div class="snno">Sin semilla</div></div><span class="snck">⬜</span></div>
+    <div class="snc" onclick="giveSnack(this)"><span class="sni">🧀</span><div><div class="snn">Quesito</div><div class="snno">Fuerza de araña 💪</div></div><span class="snck">⬜</span></div>
+    <div class="snc" onclick="giveSnack(this)"><span class="sni">🍫</span><div><div class="snn">Chocolate</div><div class="snno">¡Premio misión! 🏆</div></div><span class="snck">⬜</span></div>
+  </div>
+</div>
+
+<!-- ===== CANCIONES ===== -->
+
+<div id="canciones" class="sec">
+  <div class="slbl">🎵 Canciones del Hombre Araña</div>
+  <div class="song" onclick="toggleSong(this)">
+    <span class="soi">🕷️</span><div><div class="son">Spider-Man, Spider-Man</div><div class="sot">¡El tema del héroe! 🦸</div></div><span class="sop">▶️</span>
+    <div class="lyrics">🎵 Spider-Man, Spider-Man<br>¡Hace lo que una araña puede!<br>¿Puede columpiarse de una tela?<br>¡Claro que sí, es una araña!<br>¡Ojo, ahí viene el Hombre Araña! 🕷️🎵</div>
+  </div>
+  <div class="song" onclick="toggleSong(this)">
+    <span class="soi">🦁</span><div><div class="son">Hakuna Matata</div><div class="sot">El Rey León · Disney 🌟</div></div><span class="sop">▶️</span>
+    <div class="lyrics">🎵 Hakuna Matata, qué forma de ser...<br>¡Sin preocupaciones para el resto de tus días!<br>Es nuestra filosofía, hakuna matata 🎵</div>
+  </div>
+  <div class="song" onclick="toggleSong(this)">
+    <span class="soi">🚂</span><div><div class="son">El Trenecito</div><div class="sot">Clásico · Para moverse</div></div><span class="sop">▶️</span>
+    <div class="lyrics">🎵 Soy el tren, el trenecito<br>Que por el campo corre sin parar<br>Chu chu chu, chu chu chu ¡Todos a bordo! 🎵</div>
+  </div>
+  <div class="song" onclick="toggleSong(this)">
+    <span class="soi">🐘</span><div><div class="son">Un Elefante se Balanceaba</div><div class="sot">Para contar · Clásico</div></div><span class="sop">▶️</span>
+    <div class="lyrics">🎵 Un elefante se balanceaba<br>sobre la tela de una araña...<br>Como veía que resistía<br>fue a llamar a otro elefante 🐘🐘 🎵</div>
+  </div>
+  <div class="song" onclick="toggleSong(this)">
+    <span class="soi">🦈</span><div><div class="son">Baby Shark</div><div class="sot">Favorito · Con movimiento</div></div><span class="sop">▶️</span>
+    <div class="lyrics">🎵 Baby shark, doo doo doo...<br>Mommy shark, doo doo doo...<br>Daddy shark, doo doo doo...<br>¡Baby shark! 🦈 🎵</div>
+  </div>
+</div>
+
+<!-- ===== PREMIOS ===== -->
+
+<div id="premios" class="sec">
+  <div class="slbl">🏆 Insignias del Hombre Araña</div>
+  <div class="sd" id="sScore">0 insignias ganadas 🕷️</div>
+  <div class="sbd" id="sBoard">
+    <div style="color:#EF9A9A;font-size:11px;font-weight:700;width:100%;text-align:center;padding-top:14px">¡Las insignias de Caleb aparecen aquí! 🕸️</div>
+  </div>
+  <div class="slbl" style="font-size:14px">Elige tu insignia 🕷️</div>
+  <div class="spk">
+    <div class="so sel" onclick="selS(this)">🕷️</div>
+    <div class="so" onclick="selS(this)">🕸️</div>
+    <div class="so" onclick="selS(this)">💥</div>
+    <div class="so" onclick="selS(this)">⭐</div>
+    <div class="so" onclick="selS(this)">🦸</div>
+    <div class="so" onclick="selS(this)">🏆</div>
+    <div class="so" onclick="selS(this)">🎯</div>
+    <div class="so" onclick="selS(this)">🚀</div>
+    <div class="so" onclick="selS(this)">❤️</div>
+    <div class="so" onclick="selS(this)">🔥</div>
+  </div>
+  <button class="eb" onclick="earnSticker()">🕷️ ¡Caleb Ganó una Insignia!</button>
+</div>
+
+<script>
+/* ── TABS ── */
+function showTab(id,btn){document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');}
+
+/* ════════ CANVAS MAP ════════ */
+const canvas=document.getElementById('mapCanvas');
+const ctx=canvas.getContext('2d');
+let currentPct=0,jStart=null,jEnd=null,jInterval=null;
+let pausedAt=null,totalPausedMs=0,isPaused=false,stops=[];
+
+const ORI_FRAC=0.08, DST_FRAC=0.92;
+function oriX(){return canvas.width*ORI_FRAC;}
+function dstX(){return canvas.width*DST_FRAC;}
+function roadY(){return canvas.height*0.78;}
+
+function resizeCanvas(){
+  canvas.width=canvas.parentElement.clientWidth;
+  canvas.height=230;
+  redraw();
+}
+window.addEventListener('resize',resizeCanvas);
+
+/* ── DRAW BACKGROUND (Spider-Man cityscape) ── */
+function drawBg(){
+  const W=canvas.width,H=canvas.height;
+
+  // Night/dusk city sky
+  const sky=ctx.createLinearGradient(0,0,0,H*.55);
+  sky.addColorStop(0,'#0D1B4B');
+  sky.addColorStop(.5,'#1A237E');
+  sky.addColorStop(1,'#283593');
+  ctx.fillStyle=sky; ctx.fillRect(0,0,W,H*.55);
+
+  // Stars in sky
+  ctx.fillStyle='rgba(255,255,255,.8)';
+  [[W*.1,H*.08],[W*.22,H*.15],[W*.38,H*.06],[W*.55,H*.12],[W*.7,H*.07],[W*.85,H*.14],[W*.92,H*.05],[W*.3,H*.2],[W*.65,H*.18],[W*.15,H*.25]].forEach(([x,y])=>{
+    ctx.beginPath(); ctx.arc(x,y,1.2,0,Math.PI*2); ctx.fill();
+  });
+
+  // Moon
+  ctx.fillStyle='#FFF9C4';
+  ctx.beginPath(); ctx.arc(W*.88,H*.12,16,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#FFF59D';
+  ctx.beginPath(); ctx.arc(W*.88,H*.12,12,0,Math.PI*2); ctx.fill();
+
+  // City buildings (background)
+  const buildings=[
+    {x:0,     w:W*.08,h:H*.42,win:true},
+    {x:W*.07, w:W*.06,h:H*.35,win:true},
+    {x:W*.12, w:W*.09,h:H*.48,win:true},
+    {x:W*.2,  w:W*.07,h:H*.38,win:true},
+    {x:W*.26, w:W*.10,h:H*.44,win:true},
+    {x:W*.35, w:W*.08,h:H*.52,win:true},
+    {x:W*.42, w:W*.07,h:H*.4, win:true},
+    {x:W*.48, w:W*.09,h:H*.46,win:true},
+    {x:W*.56, w:W*.08,h:H*.5, win:true},
+    {x:W*.63, w:W*.10,h:H*.39,win:true},
+    {x:W*.72, w:W*.08,h:H*.45,win:true},
+    {x:W*.79, w:W*.07,h:H*.36,win:true},
+    {x:W*.85, w:W*.08,h:H*.49,win:true},
+    {x:W*.92, w:W*.08,h:H*.41,win:true},
+  ];
+
+  buildings.forEach(b=>{
+    // Building body
+    const bg=ctx.createLinearGradient(b.x,H*.55-b.h,b.x+b.w,H*.55);
+    bg.addColorStop(0,'#1A237E'); bg.addColorStop(1,'#283593');
+    ctx.fillStyle=bg;
+    ctx.fillRect(b.x, H*.55-b.h, b.w, b.h);
+    // Building outline
+    ctx.strokeStyle='rgba(100,130,255,.3)'; ctx.lineWidth=1;
+    ctx.strokeRect(b.x,H*.55-b.h,b.w,b.h);
+    // Windows
+    if(b.win){
+      const cols=Math.floor(b.w/9), rows=Math.floor(b.h/12);
+      for(let r=1;r<rows;r++) for(let c=0;c<cols;c++){
+        const lit=Math.random()>.4;
+        ctx.fillStyle=lit?'rgba(255,236,100,.8)':'rgba(30,50,120,.5)';
+        ctx.fillRect(b.x+c*9+2, H*.55-b.h+r*12, 5, 7);
+      }
+    }
+  });
+
+  // Road / ground
+  const roadTop=H*.55, roadH=H*.45;
+  const gnd=ctx.createLinearGradient(0,roadTop,0,H);
+  gnd.addColorStop(0,'#1a1a1a'); gnd.addColorStop(.3,'#212121'); gnd.addColorStop(1,'#111');
+  ctx.fillStyle=gnd; ctx.fillRect(0,roadTop,W,roadH);
+
+  // Road surface
+  const rY=roadY()-H*.1, rH=H*.26;
+  ctx.fillStyle='#2C2C2C'; ctx.fillRect(0,rY,W,rH);
+  // Road markings
+  ctx.fillStyle='#E0E0E0'; ctx.fillRect(0,rY+2,W,3); ctx.fillRect(0,rY+rH-5,W,3);
+  // Dashed center
+  ctx.strokeStyle='#FFD54F'; ctx.lineWidth=3; ctx.setLineDash([20,14]);
+  ctx.beginPath(); ctx.moveTo(0,rY+rH/2); ctx.lineTo(W,rY+rH/2); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Street glow / reflections
+  ctx.fillStyle='rgba(255,213,79,.04)';
+  ctx.fillRect(0,rY,W,rH);
+
+  // Web lines across sky (decorative)
+  drawWebLines(W,H);
+}
+
+function drawWebLines(W,H){
+  // Radial web from top-right corner
+  const cx=W, cy=0;
+  ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1; ctx.setLineDash([]);
+  for(let a=150;a<=230;a+=10){
+    const rad=a*Math.PI/180;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(rad)*W*.7, cy+Math.sin(rad)*H*.7);
+    ctx.stroke();
+  }
+  // Concentric arcs
+  ctx.strokeStyle='rgba(255,255,255,.08)';
+  [W*.15,W*.28,W*.42,W*.58].forEach(r=>{
+    ctx.beginPath(); ctx.arc(cx,cy,r,140*Math.PI/180,240*Math.PI/180); ctx.stroke();
+  });
+
+  // Second web from top-left
+  const cx2=0, cy2=0;
+  ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1;
+  for(let a=-30;a<=60;a+=10){
+    const rad=a*Math.PI/180;
+    ctx.beginPath();
+    ctx.moveTo(cx2,cy2);
+    ctx.lineTo(cx2+Math.cos(rad)*W*.5, cy2+Math.sin(rad)*H*.6);
+    ctx.stroke();
+  }
+  [W*.12,W*.22,W*.35].forEach(r=>{
+    ctx.beginPath(); ctx.arc(cx2,cy2,r,-40*Math.PI/180,70*Math.PI/180); ctx.stroke();
+  });
+}
+
+/* ── ROUTE ── */
+function drawRoute(){
+  const rY=roadY(), ox=oriX(), dx=dstX();
+  // Full dashed
+  ctx.strokeStyle='rgba(255,255,255,.25)'; ctx.lineWidth=4; ctx.setLineDash([12,8]);
+  ctx.beginPath(); ctx.moveTo(ox,rY); ctx.lineTo(dx,rY); ctx.stroke();
+  ctx.setLineDash([]);
+  // Traveled — red glow
+  if(currentPct>0){
+    const tx=ox+(dx-ox)*currentPct;
+    ctx.shadowColor='#EF5350'; ctx.shadowBlur=10;
+    ctx.strokeStyle='#EF5350'; ctx.lineWidth=4;
+    ctx.beginPath(); ctx.moveTo(ox,rY); ctx.lineTo(tx,rY); ctx.stroke();
+    ctx.shadowBlur=0;
+  }
+}
+
+/* ── PINS ── */
+function drawPin(x,emoji,glow){
+  const rY=roadY();
+  // Web thread going up
+  ctx.strokeStyle='rgba(255,255,255,.5)'; ctx.lineWidth=1.5;
+  ctx.beginPath();
+  // Slightly wavy thread
+  ctx.moveTo(x,rY-6);
+  ctx.quadraticCurveTo(x+4,rY-28,x,rY-42);
+  ctx.stroke();
+  // Glow circle
+  ctx.shadowColor=glow; ctx.shadowBlur=16;
+  ctx.fillStyle=glow;
+  ctx.beginPath(); ctx.arc(x,rY-55,17,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+  // White ring
+  ctx.strokeStyle='white'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.arc(x,rY-55,17,0,Math.PI*2); ctx.stroke();
+  // Emoji
+  ctx.font='20px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(emoji,x,rY-54);
+}
+
+/* ── SPIDEY CAR ── */
+function drawCar(){
+  const rY=roadY(), ox=oriX(), dx=dstX();
+  const carX=ox+(dx-ox)*currentPct;
+  // Web trail
+  if(currentPct>0.02){
+    const trailX=ox+(dx-ox)*Math.max(0,currentPct-0.06);
+    const grad=ctx.createLinearGradient(trailX,rY,carX,rY);
+    grad.addColorStop(0,'rgba(211,47,47,0)');
+    grad.addColorStop(1,'rgba(211,47,47,.4)');
+    ctx.strokeStyle=grad; ctx.lineWidth=8;
+    ctx.beginPath(); ctx.moveTo(trailX,rY); ctx.lineTo(carX,rY); ctx.stroke();
+  }
+  // Shadow
+  ctx.fillStyle='rgba(0,0,0,.3)';
+  ctx.beginPath(); ctx.ellipse(carX,rY+8,22,5,0,0,Math.PI*2); ctx.fill();
+  // Red glow
+  ctx.shadowColor='#D32F2F'; ctx.shadowBlur=18;
+  ctx.fillStyle='#D32F2F';
+  ctx.beginPath(); ctx.arc(carX,rY-2,20,0,Math.PI*2); ctx.fill();
+  ctx.shadowBlur=0;
+  // Blue ring
+  ctx.strokeStyle='#1565C0'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.arc(carX,rY-2,20,0,Math.PI*2); ctx.stroke();
+  // Spidey emoji
+  ctx.font='22px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText('🕷️',carX,rY-1);
+}
+
+/* ── STOP MARKERS ── */
+function drawStops(){
+  const rY=roadY(), ox=oriX(), dx=dstX();
+  stops.forEach(s=>{
+    const sx=ox+(dx-ox)*s.pct;
+    ctx.shadowColor='#FF8F00'; ctx.shadowBlur=10;
+    ctx.fillStyle='#FF8F00'; ctx.strokeStyle='white'; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.arc(sx,rY-22,11,0,Math.PI*2); ctx.fill(); ctx.stroke();
+    ctx.shadowBlur=0;
+    ctx.font='13px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('☕',sx,rY-22);
+    const lbl=s.durationMin+'min';
+    ctx.font='bold 9px Nunito,sans-serif';
+    const tw=ctx.measureText(lbl).width+10;
+    ctx.fillStyle='rgba(255,143,0,.9)';
+    rrect(ctx,sx-tw/2,rY-42,tw,13,4); ctx.fill();
+    ctx.fillStyle='white'; ctx.textAlign='center';
+    ctx.fillText(lbl,sx,rY-36);
+  });
+}
+function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
+
+function redraw(){
+  if(!ctx) return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawBg();
+  drawRoute();
+  drawStops();
+  drawPin(oriX(),'🏠','#43A047');
+  drawPin(dstX(),'🏡','#D32F2F');
+  if(jStart) drawCar();
+}
+
+/* ════════ JOURNEY ════════ */
+function parseT(s){const[h,m]=s.split(':').map(Number);const d=new Date();d.setHours(h,m,0,0);return d;}
+function ft(d){return d.toLocaleTimeString('es-CR',{hour:'2-digit',minute:'2-digit',hour12:true});}
+
+function startJourney(){
+  jStart=parseT(document.getElementById('departT').value||'07:00');
+  jEnd=parseT(document.getElementById('arrivalT').value||'10:00');
+  if(jEnd<=jStart) jEnd.setDate(jEnd.getDate()+1);
+  totalPausedMs=0; isPaused=false; stops=[]; currentPct=0;
+  document.getElementById('dspDepart').textContent=ft(jStart);
+  document.getElementById('dspArrival').textContent=ft(jEnd);
+  document.getElementById('kidProgress').style.display='block';
+  if(jInterval) clearInterval(jInterval);
+  updateLive(); jInterval=setInterval(updateLive,15000);
+}
+
+function effectiveDur(){return jEnd-jStart-totalPausedMs;}
+
+const spideyMsgs=[
+  ['🕷️ ¡La misión comienza!','🚀 ¡Lanzando telaraña!','🕸️ ¡Spidey está en camino!'],
+  ['💥 ¡Vamos súper bien!','🦸 ¡Más de la mitad!','⭐ ¡Caleb es un héroe!'],
+  ['🏠 ¡Ya casi llegamos!','🎯 ¡Casi en el objetivo!','🔥 ¡Poquito falta!'],
+  ['🏆 ¡¡MISIÓN CUMPLIDA!!','🎉 ¡¡LLEGAMOS HÉROES!!','🕷️ ¡¡Spider-Caleb lo logró!!']
+];
+
+function updateLive(){
+  if(!jStart||!jEnd||isPaused) return;
+  const now=new Date();
+  const elapsed=(now-jStart)-totalPausedMs;
+  currentPct=Math.min(1,Math.max(0,elapsed/effectiveDur()));
+  const pct=currentPct*100;
+  const leftMs=Math.max(0,jEnd.getTime()+totalPausedMs-now.getTime());
+  const lh=Math.floor(leftMs/3600000), lm=Math.round((leftMs%3600000)/60000);
+  const ls=lh>0?`${lh}h ${lm}m`:`${lm} min`;
+
+  document.getElementById('progFill').style.width=Math.max(3,pct)+'%';
+  document.getElementById('dspNow').textContent=ft(now);
+  document.getElementById('dspArrival').textContent=ft(jEnd);
+
+  const mi=pct>=99?3:pct>=66?2:pct>=33?1:0;
+  const msgs=spideyMsgs[mi];
+  document.getElementById('progLabel').textContent=pct>=99?msgs[0]:`${msgs[Math.floor(now.getSeconds()/20)%msgs.length]} — Faltan ${ls}`;
+
+  [[1,25],[2,50],[3,75],[4,90]].forEach(([n,th])=>document.getElementById('ms'+n).classList.toggle('lit',pct>=th));
+  redraw();
+}
+
+/* PAUSE / RESUME */
+function pauseJourney(){
+  if(!jStart||isPaused) return;
+  isPaused=true; pausedAt=new Date();
+  document.getElementById('btnPause').style.display='none';
+  document.getElementById('btnResume').style.display='block';
+  document.getElementById('pausePanel').classList.add('show');
+  document.getElementById('nowBox').classList.add('paused');
+  document.getElementById('nowIcon').textContent='⏸️';
+  document.getElementById('pauseInfo').textContent=`⏸️ Paramos a las ${ft(pausedAt)}. ¿A qué hora seguimos?`;
+  const sug=new Date(pausedAt.getTime()+30*60000);
+  document.getElementById('resumeT').value=`${String(sug.getHours()).padStart(2,'0')}:${String(sug.getMinutes()).padStart(2,'0')}`;
+  if(jInterval){clearInterval(jInterval);jInterval=null;}
+}
+function showResumePanel(){document.getElementById('pausePanel').classList.add('show');}
+function resumeJourney(){
+  if(!isPaused) return;
+  const rTime=parseT(document.getElementById('resumeT').value);
+  if(rTime<pausedAt) rTime.setDate(rTime.getDate()+1);
+  const dur=rTime-pausedAt;
+  totalPausedMs+=dur;
+  const pMin=Math.round(dur/60000);
+  jEnd=new Date(jEnd.getTime()+dur);
+  stops.push({pct:currentPct,pauseTime:pausedAt,resumeTime:rTime,durationMin:pMin});
+  updateStopLog();
+  isPaused=false; pausedAt=null;
+  document.getElementById('btnPause').style.display='block';
+  document.getElementById('btnResume').style.display='none';
+  document.getElementById('pausePanel').classList.remove('show');
+  document.getElementById('nowBox').classList.remove('paused');
+  document.getElementById('nowIcon').textContent='🕷️';
+  jInterval=setInterval(updateLive,15000); updateLive();
+}
+function updateStopLog(){
+  if(!stops.length) return;
+  document.getElementById('stopLog').style.display='block';
+  document.getElementById('stopEntries').innerHTML=stops.map((s,i)=>`<div class="stop-entry"><div class="stop-dot"></div><span>Parada ${i+1}: ${ft(s.pauseTime)} → ${ft(s.resumeTime)}</span><span style="margin-left:auto;font-weight:800;color:#D32F2F">${s.durationMin} min</span></div>`).join('');
+}
+
+/* STOPS */
+function toggleStop(n){const e=document.getElementById('sb'+n);e.classList.toggle('done');e.innerHTML=e.classList.contains('done')?['✅<br>Listo','✅<br>Listo','✅<br>Listo'][n-1]:['🚽<br>Baño','🍔<br>Comida','⛽<br>Gasolina'][n-1];}
+
+/* RESET */
+function resetJourney(){
+  if(jInterval){clearInterval(jInterval);jInterval=null;}
+  jStart=null;jEnd=null;currentPct=0;isPaused=false;pausedAt=null;totalPausedMs=0;stops=[];
+  document.getElementById('kidProgress').style.display='none';
+  document.getElementById('pausePanel').classList.remove('show');
+  document.getElementById('stopLog').style.display='none';
+  document.getElementById('stopEntries').innerHTML='';
+  document.getElementById('progFill').style.width='3%';
+  document.getElementById('btnPause').style.display='block';
+  document.getElementById('btnResume').style.display='none';
+  document.getElementById('nowIcon').textContent='🕷️';
+  document.getElementById('nowBox').classList.remove('paused');
+  ['ms1','ms2','ms3','ms4'].forEach(id=>document.getElementById(id).classList.remove('lit'));
+  ['sb1','sb2','sb3'].forEach((id,i)=>{const e=document.getElementById(id);e.classList.remove('done');e.innerHTML=['🚽<br>Baño','🍔<br>Comida','⛽<br>Gasolina'][i];});
+  redraw();
+}
+
+/* GAMES */
+const games={
+  spy:{title:'👁️ Ojo de Araña',html:()=>[['🌳','Árbol'],['🚗','Carro rojo'],['🏠','Casa'],['☁️','Nube'],['🐄','Vaca'],['🌲','Pino'],['⛽','Gasolinera'],['🚦','Semáforo'],['🐦','Pájaro'],['🌻','Flor'],['🚛','Camión'],['⛰️','Montaña'],['🏪','Tienda'],['🌊','Río'],['🐕','Perro']].map(([i,l])=>`<div class="si2" onclick="this.classList.toggle('found')"><span class="sic">${i}</span><span class="sil">${l}</span><span style="margin-left:auto">⬜</span></div>`).join('')},
+  riddle:{title:'🤔 Acertijos de Spidey',html:()=>{const rs=[{q:'Tengo manos pero no puedo aplaudir. ¿Qué soy?',a:'¡Un reloj! ⏰'},{q:'Soy redondo y amarillo, por las mañanas brillo. ¿Quién soy?',a:'¡El sol! ☀️'},{q:'Tengo muchos dientes pero no puedo morder. ¿Qué soy?',a:'¡Un peine! 🪮'},{q:'Cuanto más me secas, más mojado me pongo. ¿Qué soy?',a:'¡Una toalla! 🏖️'},{q:'Soy verde por fuera y roja por dentro, con semillitas negras. ¿Qué soy?',a:'¡Una sandía! 🍉'},{q:'¿De qué color es el traje de Spider-Man?',a:'¡Rojo y azul! 🕷️'},{q:'Soy una fruta amarilla que a los monos les encanta. ¿Quién soy?',a:'¡El banano! 🍌'},{q:'¿Qué lanza el Hombre Araña de sus muñecas?',a:'¡Telarañas! 🕸️'}];const r=rs[Math.floor(Math.random()*rs.length)];return `<div class="rc"><div class="rq">🕷️ ${r.q}</div><button class="rab" id="ridBtn" onclick="showAns('${r.a.replace(/'/g,"\\'")}')">¡Ver respuesta!</button><div class="rat" id="ridAns"></div></div><button class="bn" onclick="openGame('riddle')">Otro acertijo 🔄</button>`;}},
+  abc:{title:'🔤 ABC del Camino',html:()=>`<p style="font-weight:800;color:#B71C1C;font-size:12px;margin-bottom:8px">🕸️ Busca algo que empiece con cada letra. Toca cuando la encuentren!</p><div class="abcg">${[['A','Árbol'],['B','Bus'],['C','Casa'],['D','Dueño'],['E','Escuela'],['F','Flor'],['G','Gasolinera'],['H','Hombre'],['I','Iglesia'],['J','Jardín'],['L','Lago'],['M','Montaña'],['N','Nube'],['O','Oveja'],['P','Puente'],['R','Río'],['S','Señal'],['T','Tractor'],['V','Vaca'],['Z','Zopilote']].map(([l,h])=>`<div class="ac" onclick="this.classList.toggle('found')"><div class="al">${l}</div><div class="aw">${h}</div></div>`).join('')}</div>`},
+  story:{title:'📖 Aventura Spider-Man',html:()=>{const ss=['Spider-Man necesitaba ayuda de Caleb porque el Duende Verde...','En la ciudad de Nueva York, Caleb encontró una telaraña mágica que...','El Hombre Araña y Caleb volaban por los edificios cuando de repente...','Un villano muy malo robó el helado de todos. ¡Caleb y Spidey decidieron...','Spider-Man le dijo a Caleb: "eres el mejor compañero porque..."'];const s=ss[Math.floor(Math.random()*ss.length)];return `<div class="rc"><div class="rq">🕷️ <em>"${s}"</em></div></div><p style="font-size:11px;font-weight:800;color:#546E7A;margin:8px 0">👨‍👦 Papá dice una parte, Caleb dice la siguiente. ¡Sin respuesta incorrecta! 🦸</p><button class="bn" onclick="openGame('story')">Nueva aventura 🔄</button>`;}},
+  colors:{title:'🌈 Caza Colores',html:()=>`<p style="font-weight:800;color:#B71C1C;font-size:12px;margin-bottom:8px">¡El primero en ver algo de ese color gana un punto! 🏆</p>${[['🔴','Rojo','¡El color de Spidey!'],['🔵','Azul','¡También de Spidey!'],['🟡','Amarillo','Taxi, flor, señal'],['🟢','Verde','Árbol, hierba, carro'],['⚪','Blanco','Nube, pared, carro'],['🟠','Naranja','Cono, flor, fruta']].map(([i,c,h])=>`<div class="si2" onclick="this.classList.toggle('found')"><span class="sic">${i}</span><div><div style="font-weight:800;font-size:13px;color:#37474F">${c}</div><div style="font-size:10px;color:#90A4AE">${h}</div></div></div>`).join('')}`},
+  cars:{title:'🚗 Cuenta Carros',html:()=>`<p style="font-weight:800;color:#B71C1C;font-size:12px;margin-bottom:8px">Cada quien cuenta carros de un color. ¿Quién llega a 10 primero? 🏁</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">${[['🔴','Rojos','#EF5350'],['🔵','Azules','#42A5F5'],['⚫','Negros','#546E7A'],['⚪','Blancos','#90A4AE']].map(([i,l,c])=>`<div style="background:#fff;border-radius:11px;padding:10px;text-align:center;box-shadow:0 3px 8px rgba(0,0,0,.07)"><div style="font-size:25px">${i}</div><div style="font-family:'Fredoka One',cursive;font-size:12px;color:${c}">${l}</div><div style="font-family:'Fredoka One',cursive;font-size:29px;color:#37474F" id="ct_${l}">0</div><div style="display:flex;gap:5px;justify-content:center;margin-top:3px"><button onclick="cc('${l}',-1)" style="background:#ECEFF1;border:none;border-radius:6px;width:26px;height:26px;font-size:14px;cursor:pointer">−</button><button onclick="cc('${l}',1)" style="background:${c};color:#fff;border:none;border-radius:6px;width:26px;height:26px;font-size:14px;cursor:pointer">+</button></div></div>`).join('')}</div><button class="bn" onclick="resetCC()">Reiniciar 🔄</button>`}
+};
+const carCts={};
+function cc(l,d){carCts[l]=Math.max(0,(carCts[l]||0)+d);const e=document.getElementById('ct_'+l);if(e)e.textContent=carCts[l];if(carCts[l]>=10)setTimeout(()=>alert(`🎉 ¡${l} llegó a 10! ¡Eres un héroe como Spidey!`),100);}
+function resetCC(){['Rojos','Azules','Negros','Blancos'].forEach(l=>{carCts[l]=0;const e=document.getElementById('ct_'+l);if(e)e.textContent=0;});}
+function openGame(id){const g=games[id];document.getElementById('gT').textContent=g.title;document.getElementById('gC').innerHTML=g.html();document.getElementById('gameOv').classList.add('open');if(id==='riddle')setTimeout(()=>{const b=document.getElementById('ridBtn');if(b)b.style.display='inline-block';},1500);}
+function closeGame(){document.getElementById('gameOv').classList.remove('open');}
+function showAns(a){const b=document.getElementById('ridBtn');if(b)b.style.display='none';const e=document.getElementById('ridAns');if(e){e.textContent=a;e.style.display='block';}}
+
+/* SNACKS */
+function giveSnack(c){c.classList.toggle('given');c.querySelector('.snck').textContent=c.classList.contains('given')?'✅':'⬜';}
+
+/* SONGS */
+function toggleSong(item){const ly=item.querySelector('.lyrics');const was=ly.classList.contains('show');document.querySelectorAll('.lyrics').forEach(l=>l.classList.remove('show'));document.querySelectorAll('.song').forEach(s=>s.classList.remove('playing'));if(!was){ly.classList.add('show');item.classList.add('playing');}}
+
+/* STICKERS */
+let curS='🕷️',sCnt=0;
+function selS(el){document.querySelectorAll('.so').forEach(s=>s.classList.remove('sel'));el.classList.add('sel');curS=el.textContent;}
+function earnSticker(){
+  const b=document.getElementById('sBoard');
+  if(b.querySelector('div[style]'))b.innerHTML='';
+  const s=document.createElement('span');s.className='es';s.textContent=curS;b.appendChild(s);
+  sCnt++;
+  document.getElementById('sScore').textContent=`${sCnt} insignia${sCnt!==1?'s':''} ganada${sCnt!==1?'s':''} 🕷️`;
+  if(sCnt===5)setTimeout(()=>alert('🕷️🏆 ¡¡CALEB ES EL NUEVO SPIDER-MAN!! ¡5 insignias! 🏆🕷️'),300);
+}
+
+/* INIT */
+resizeCanvas();
+</script>
+
+</body>
+</html>
